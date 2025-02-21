@@ -1,0 +1,69 @@
+package org.tqs.deti.ua;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class TqsStackTest {
+
+    @Test
+    public void testPush() {
+        TqsStack<Integer> stack = new TqsStack<>();
+        stack.push(1);
+        assertEquals(1, stack.size());
+        assertFalse(stack.isEmpty());
+    }
+
+    @Test
+    public void testPop() {
+        TqsStack<Integer> stack = new TqsStack<>();
+        stack.push(1);
+        int value = stack.pop();
+        assertEquals(1, value);
+        assertTrue(stack.isEmpty());
+    }
+
+    @Test
+    public void testPeek() {
+        TqsStack<Integer> stack = new TqsStack<>();
+        stack.push(1);
+        int value = stack.peek();
+        assertEquals(1, value);
+        assertFalse(stack.isEmpty());
+    }
+
+    @Test
+    public void testIsEmpty() {
+        TqsStack<Integer> stack = new TqsStack<>();
+        assertTrue(stack.isEmpty());
+        stack.push(1);
+        assertFalse(stack.isEmpty());
+    }
+
+    @Test
+    public void testSize() {
+        TqsStack<Integer> stack = new TqsStack<>();
+        assertEquals(0, stack.size());
+        stack.push(1);
+        assertEquals(1, stack.size());
+    }
+
+    @Test
+    public void testPopEmptyStack() {
+        TqsStack<Integer> stack = new TqsStack<>();
+        assertThrows(java.util.NoSuchElementException.class, stack::pop);
+    }
+
+    @Test
+    public void testPeekEmptyStack() {
+        TqsStack<Integer> stack = new TqsStack<>();
+        assertThrows(java.util.NoSuchElementException.class, stack::peek);
+    }
+
+    @Test
+    public void testPushBoundedStack() {
+        TqsStack<Integer> stack = new TqsStack<>(1);
+        stack.push(1);
+        assertThrows(IllegalStateException.class, () -> stack.push(2));
+    }
+
+}
