@@ -1,6 +1,4 @@
-# **Mockito Testing Notes**
-
-## **1. Basic Annotations**
+## **Basic Annotations**
 | Annotation | Description |
 |------------|------------|
 | `@Mock` | Creates a mock instance of a class. |
