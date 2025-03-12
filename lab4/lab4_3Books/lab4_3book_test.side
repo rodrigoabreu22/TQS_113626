@@ -1,0 +1,94 @@
+{
+  "id": "d908a91c-e4fc-4045-9b9e-8c645534db44",
+  "version": "2.0",
+  "name": "lab4_3book_test",
+  "url": "https://cover-bookstore.onrender.com",
+  "tests": [{
+    "id": "366aa0aa-00b0-4f9c-92f9-6a4072e85d0a",
+    "name": "lab4_3bookTest",
+    "commands": [{
+      "id": "e84a21f5-7995-4c3d-8062-c3cb0a76f88d",
+      "comment": "",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "bce68559-31f0-4c7b-b480-272716926ca5",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "550x696",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "9b4a28f9-bd51-433a-a60c-16b09b1e0c4b",
+      "comment": "",
+      "command": "click",
+      "target": "css=div:nth-child(1) > .Navbar_searchBar__3q5Gb > .Navbar_searchBarInput__w8FwI",
+      "targets": [
+        ["css=div:nth-child(1) > .Navbar_searchBar__3q5Gb > .Navbar_searchBarInput__w8FwI", "css:finder"],
+        ["xpath=(//input[@value=''])[2]", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/div/div/div[3]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[3]/div/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "62b15973-3b0e-4541-964a-39f21dbb0b12",
+      "comment": "",
+      "command": "type",
+      "target": "css=div:nth-child(1) > .Navbar_searchBar__3q5Gb > .Navbar_searchBarInput__w8FwI",
+      "targets": [
+        ["css=div:nth-child(1) > .Navbar_searchBar__3q5Gb > .Navbar_searchBarInput__w8FwI", "css:finder"],
+        ["xpath=(//input[@value='Harry Potter'])[2]", "xpath:attributes"],
+        ["xpath=//div[@id='root']/div/div/div/div[3]/div/div/input", "xpath:idRelative"],
+        ["xpath=//div[3]/div/div/input", "xpath:position"]
+      ],
+      "value": "Harry Potter"
+    }, {
+      "id": "0d39a5dc-6f3c-4460-b392-f38244bcdb44",
+      "comment": "",
+      "command": "click",
+      "target": "css=div:nth-child(1) > .Navbar_searchBar__3q5Gb .Navbar_searchBtnIcon__25k0u",
+      "targets": [
+        ["css=div:nth-child(1) > .Navbar_searchBar__3q5Gb .Navbar_searchBtnIcon__25k0u", "css:finder"],
+        ["xpath=(//img[@alt='Search'])[2]", "xpath:img"],
+        ["xpath=//div[@id='root']/div/div/div/div[3]/div/div/button/img", "xpath:idRelative"],
+        ["xpath=//div[3]/div/div/button/img", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "9d5cdeaf-948e-4a63-a14b-950c37e4dce2",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.SearchList_bookTitle__1wo4a",
+      "targets": [
+        ["css=.SearchList_bookTitle__1wo4a", "css:finder"],
+        ["xpath=//div[@id='root']/div[2]/div/div[2]/div/span", "xpath:idRelative"],
+        ["xpath=//div[2]/div/div[2]/div/span", "xpath:position"]
+      ],
+      "value": "Harry Potter and the Sorcerer's Stone"
+    }, {
+      "id": "1f3b071a-3185-4bf8-9e75-9fbf60e1a22a",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.SearchList_bookAuthor__3giPc",
+      "targets": [
+        ["css=.SearchList_bookAuthor__3giPc", "css:finder"],
+        ["xpath=//div[@id='root']/div[2]/div/div[2]/div/span[3]", "xpath:idRelative"],
+        ["xpath=//span[3]", "xpath:position"],
+        ["xpath=//span[contains(.,'J.K. Rowling')]", "xpath:innerText"]
+      ],
+      "value": "J.K. Rowling"
+    }]
+  }],
+  "suites": [{
+    "id": "846f32bd-6e0e-4225-a2ac-c9dfdca3ec37",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": []
+  }],
+  "urls": ["https://cover-bookstore.onrender.com/"],
+  "plugins": []
+}
