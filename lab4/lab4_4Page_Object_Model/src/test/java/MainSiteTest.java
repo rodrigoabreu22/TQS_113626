@@ -1,25 +1,18 @@
+import io.github.bonigarcia.seljup.BrowserType;
+import io.github.bonigarcia.seljup.DockerBrowser;
 import io.github.bonigarcia.seljup.SeleniumJupiter;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 
 @ExtendWith(SeleniumJupiter.class)
 public class MainSiteTest {
-    WebDriver driver;
-
-    @BeforeEach
-    public void setup(){
-        driver = new FirefoxDriver();
-    }
 
     @Test
-    public void testFlightPurchase() {
+    public void testFlightPurchase(@DockerBrowser(type = BrowserType.CHROME) WebDriver driver) {
 
         driver.get("https://blazedemo.com/");
 
@@ -66,10 +59,5 @@ public class MainSiteTest {
 
         assertEquals(confirmationPage.getConfirmationMessage(), "Thank you for your purchase today!");
 
-    }
-
-    @AfterEach
-    public void close(){
-        driver.close();
     }
 }
