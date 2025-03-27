@@ -34,14 +34,6 @@ public class ControllerEx5IT {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private CarRepository carRepository;
-
-    //@AfterEach
-    //public void resetDb() {
-    //    carRepository.deleteAll();
-    //}
-
     @BeforeEach
     public void setup() {
         RestAssuredMockMvc.mockMvc(mockMvc);
