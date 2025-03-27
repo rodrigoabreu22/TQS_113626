@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: org.tqs.deti.ua.lab6_5cars_IT.ControllerEx5IT
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.903 s -- in org.tqs.deti.ua.lab6_5cars_IT.ControllerEx5IT
