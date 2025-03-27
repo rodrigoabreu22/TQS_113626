@@ -1,6 +1,9 @@
 package org.tqs.deti.ua.lab6_1Test_Container;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -40,15 +43,19 @@ public class EmployeeIT {
     @Test
     @Order(1)
     public void addNewEmployee() {
-        System.out.println("Employee Repository: " + employeeRepository);
-
-        if (employeeRepository == null) {
-            throw new IllegalStateException("EmployeeRepository is not injected!");
-        }
-
         Employee emp = new Employee("Lebron", "James", 100000, "player");
+
         employeeRepository.save(emp);
+
         System.out.println(String.format("%s saved!", emp.toString()));
+
+        Optional<Employee> emp_fetched = employeeRepository.findById(emp.getId());
+
+        assertTrue(emp_fetched.isPresent());
+        assertEquals(emp.getFirstName(), emp_fetched.get().getFirstName());
+        assertEquals(emp.getLastName(), emp_fetched.get().getLastName());
+        assertEquals(emp.getSalary(), emp_fetched.get().getSalary());
+        assertEquals(emp.getRole(), emp_fetched.get().getRole());
     }
 
     @Test
@@ -73,12 +80,28 @@ public class EmployeeIT {
 
         emp.setRole("my sunshine");
         employeeRepository.save(emp);
+        Optional<Employee> emp_fetched = employeeRepository.findById(emp.getId());
 
-        System.out.println(String.format("%s updated!", emp));
+        System.out.println(String.format("%s updated!", emp_fetched));
 
-        assertTrue(emp.getFirstName().equals("Lebron"));
-        assertTrue(emp.getLastName().equals("James"));
-        assertTrue(emp.getRole().equals("my sunshine"));
-        assertTrue(emp.getSalary()==100000);
+        assertTrue(emp_fetched.get().getFirstName().equals("Lebron"));
+        assertTrue(emp_fetched.get().getLastName().equals("James"));
+        assertTrue(emp_fetched.get().getRole().equals("my sunshine"));
+        assertTrue(emp_fetched.get().getSalary()==100000);
+    }
+
+    @Test
+    @Order(4)
+    public void removeEmployee() {
+        Employee emp = employeeRepository.findByLastName("James").get(0);
+    
+        System.out.println(String.format("%s to be removed!", emp));
+    
+        long id = emp.getId();
+        employeeRepository.delete(emp);
+    
+        Optional<Employee> emp_fetched = employeeRepository.findById(id);
+    
+        assertTrue(emp_fetched.isEmpty());
     }
 }
