@@ -65,3 +65,26 @@ These lighthouse tests were both made on incognito mode:
 Results report on mobile mode: [here](lighthouse_report_site_ua_mobile.pdf)
 
 Results report on desktop mode: [here](lighthouse_report_site_ua_desktop.pdf)
+
+- Both test results reveal that performance is the major issue on UA website, with a score of 37/36 which is very low. 
+- The desktop version has slightly worse acessibility (88/82) and SEO (92/85). 
+- Best Pratices stayed the same on both (96).
+
+In the results pdf, a list of the main performance problems can be found.
+
+#### How easy is it to fix issues in a site that has been live for a long time?
+Fixing issues in a site that has been live for a long time may be challemnging. We may have to face the following challenges: 
+- **Legacy Code & Dependencies** – Outdated libraries/frameworks may require major refactoring.
+- **Complexity & Technical Debt** – Accumulated inefficiencies make optimizations harder without breaking features.
+- **Third-Party Integrations** – External scripts can slow performance but may be difficult to remove if essential.
+- **SEO & UX Risks** – Changes in structure or content can impact rankings and user experience; thorough testing is crucial.
+
+#### Could this be avoided and how? 
+This could have been avoided if these tests were applied regularly during development and, consequnetly, the code being optimized accordingly. 
+Here is some aspects that could have improved this:
+- Follow Performance Best Practices from the Start
+- Regularly Audit and Optimize the Site
+- Monitor Third-Party Scripts
+- Use Scalable Architecture
+
+
