@@ -11,3 +11,7 @@ I will use Thymeleaf for frontend.
 ### DER
 
 ![alt text](DER_HW1_TQS.png)
+
+## ER
+
+![alt text](ER_HW1_TQS.png)
