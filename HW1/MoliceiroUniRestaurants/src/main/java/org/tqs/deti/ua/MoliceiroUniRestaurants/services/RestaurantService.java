@@ -35,6 +35,8 @@ public class RestaurantService {
 
     public void deleteRestaurant(long id) {
         Restaurant restaurant = restaurantRepository.findById(id);
-        restaurantRepository.delete(restaurant);
+        if (restaurant != null) {
+            restaurantRepository.delete(restaurant);
+        }
     }
 }

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity(name="restaurant")
 public class Restaurant {
@@ -43,12 +44,33 @@ public class Restaurant {
         return id;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public int getWeatherId() {
         return weatherId;
     }
 
     public void setWeatherId(int weatherId) {
         this.weatherId = weatherId;
+    }
+
+    // Add these methods to your Restaurant class
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Restaurant that = (Restaurant) o;
+        return id == that.id &&
+                weatherId == that.weatherId &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(meals, that.meals);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, weatherId, meals);
     }
 
     @Override

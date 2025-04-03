@@ -54,6 +54,9 @@ public class MealService {
 
     public void deleteMeal(long id) {
         Meal meal = getMealById(id);
-        mealRepository.delete(meal);
+        if (meal != null) {
+            mealRepository.delete(meal);
+        }
+        // No action if meal not found
     }
 }

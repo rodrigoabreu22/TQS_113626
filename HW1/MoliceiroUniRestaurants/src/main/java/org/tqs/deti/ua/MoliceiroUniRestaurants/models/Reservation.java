@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.Objects;
+
 @Entity(name="reservation")
 public class Reservation {
 
@@ -36,12 +38,29 @@ public class Reservation {
         return code;
     }
 
+    public void setCode(long code) {
+        this.code = code;
+    }
+
     public Meal getMeal() {
         return meal;
     }
 
     public void setMeal(Meal meal) {
         this.meal = meal;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Reservation that = (Reservation) o;
+        return code == that.code;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(code);
     }
 
     @Override

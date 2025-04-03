@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity(name="meal")
 public class Meal {
@@ -52,6 +53,10 @@ public class Meal {
         return id;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
@@ -90,6 +95,24 @@ public class Meal {
 
     public void setReservations(List<Reservation> reservations) {
         this.reservations = reservations;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Meal meal = (Meal) o;
+        return id == meal.id &&
+                reservationLimit == meal.reservationLimit &&
+                Objects.equals(name, meal.name) &&
+                Objects.equals(type, meal.type) &&
+                Objects.equals(date, meal.date) &&
+                Objects.equals(restaurant, meal.restaurant);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, type, reservationLimit, date, restaurant);
     }
 
     @Override
