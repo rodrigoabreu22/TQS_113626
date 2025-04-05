@@ -1,6 +1,8 @@
 package org.tqs.deti.ua.MoliceiroUniRestaurants.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,8 +20,14 @@ public class WeatherController {
     private WeatherService weatherService;
 
     @GetMapping("/{id}")
-    public HashMap<String, List<String>> getRestaurantWeatherData(@PathVariable(value="id") Long id) {
-        return weatherService.getRestaurantWeatherData(id);
+    public ResponseEntity<?> getRestaurantWeatherData(@PathVariable(value="id") Long id) {
+        try {
+            HashMap<String, List<String>> weatherData = weatherService.getRestaurantWeatherData(id);
+            return ResponseEntity.ok(weatherData);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body("Error fetching weather data: " + e.getMessage());
+        }
     }
 
 }

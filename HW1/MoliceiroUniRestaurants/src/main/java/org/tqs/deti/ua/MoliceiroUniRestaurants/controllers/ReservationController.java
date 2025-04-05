@@ -1,6 +1,9 @@
 package org.tqs.deti.ua.MoliceiroUniRestaurants.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.models.Reservation;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.services.ReservationService;
@@ -15,7 +18,7 @@ public class ReservationController {
     ReservationService reservationService;
 
     @PostMapping("")
-    public Reservation createReservation(@RequestBody Reservation reservation) {
+    public Reservation createReservation(@Valid @RequestBody Reservation reservation) {
         return reservationService.bookMeal(reservation);
     }
 
@@ -29,13 +32,23 @@ public class ReservationController {
         return reservationService.getMealReservations(id, status);
     }
 
-    @PutMapping("/{code}/cancel")
-    public void cancelReservation(@PathVariable(value="code") Long code) {
-        reservationService.cancelReservation(code);
+    @PutMapping("/{code}/validate")
+    public ResponseEntity<String> validateReservation(@PathVariable(value="code") Long code) {
+        try {
+            reservationService.validateReservation(code);
+            return ResponseEntity.ok().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
 
-    @PutMapping("/{code}/validate")
-    public void validateReservation(@PathVariable(value="code") Long code) {
-        reservationService.validateReservation(code);
+    @PutMapping("/{code}/cancel")
+    public ResponseEntity<String> cancelReservation(@PathVariable(value="code") Long code) {
+        try {
+            reservationService.cancelReservation(code);
+            return ResponseEntity.ok().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
 }

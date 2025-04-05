@@ -12,73 +12,76 @@ import java.util.List;
 
 @Service
 public class ReservationService {
+    private final ReservationRepository reservationRepository;
 
     @Autowired
-    ReservationRepository reservationRepository;
-
-
-    public Reservation bookMeal(Reservation reservation) {
-        long mealId = reservation.getMeal().getId();
-        int validReservations = reservationRepository.findByMealIdAndStatus(mealId, "VALIDA").size();
-        int reservationsLimit = reservation.getMeal().getReservationLimit();
-
-        String mealType = reservation.getMeal().getType();
-        LocalDateTime now = LocalDateTime.now();
-
-        // Time constraints for lunch and dinner
-        LocalDateTime lunchDeadline = LocalDateTime.of(now.toLocalDate(), LocalTime.of(12, 0));
-        LocalDateTime dinnerDeadline = LocalDateTime.of(now.toLocalDate(), LocalTime.of(18, 0));
-
-        if (validReservations < reservationsLimit) {
-            if (mealType.equalsIgnoreCase("Almoço") && now.isBefore(lunchDeadline)) {
-                return reservationRepository.save(reservation);
-            }
-            else if (mealType.equalsIgnoreCase("Jantar") && now.isBefore(dinnerDeadline)) {
-                return reservationRepository.save(reservation);
-            }
-        }
-
-        return null;
+    public ReservationService(ReservationRepository reservationRepository) {
+        this.reservationRepository = reservationRepository;
     }
 
+    public Reservation bookMeal(Reservation reservation) {
+        if (reservation == null || reservation.getMeal() == null) {
+            throw new IllegalArgumentException("Reservation and meal must not be null");
+        }
+
+        LocalDate mealDate = reservation.getMeal().getDate();
+        if (mealDate == null || mealDate.isBefore(LocalDate.now())) {
+            return null;
+        }
+
+        long mealId = reservation.getMeal().getId();
+        int validReservations = reservationRepository.findByMealIdAndStatus(mealId, "VALIDA").size();
+        int limit = reservation.getMeal().getReservationLimit();
+
+        if (validReservations >= limit) {
+            return null;
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        String mealType = reservation.getMeal().getType();
+        LocalTime deadline = mealType.equalsIgnoreCase("Almoço") ? LocalTime.of(12, 0) : LocalTime.of(18, 0);
+
+        if (mealDate.isEqual(LocalDate.now()) && now.toLocalTime().isAfter(deadline)) {
+            return null;
+        }
+
+        reservation.setStatus("VALIDA"); // Explicitly set status
+        return reservationRepository.save(reservation);
+    }
 
     public Reservation getReservationByCode(long code) {
         return reservationRepository.findByCode(code);
     }
 
     public List<Reservation> getMealReservations(long mealId, String status) {
-        if (status == null){
-            return reservationRepository.findByMealId(mealId);
-        }
-        return reservationRepository.findByMealIdAndStatus(mealId, status);
+        return status == null ?
+                reservationRepository.findByMealId(mealId) :
+                reservationRepository.findByMealIdAndStatus(mealId, status);
     }
 
     public void cancelReservation(long reservationId) {
         Reservation res = getReservationByCode(reservationId);
-        if (res.getStatus().equals("VALIDA")){
+        if (res != null && "VALIDA".equals(res.getStatus())) {
             res.setStatus("CANCELADA");
             reservationRepository.save(res);
         }
-        System.out.println("Invalid reservation!");
     }
 
-    public void validateReservation(long reservationId) {
+    public boolean validateReservation(long reservationId) {
         Reservation res = getReservationByCode(reservationId);
-        LocalDate today = LocalDate.now();  // Get current date
-        LocalDate mealDay = res.getMeal().getDate();  // Get meal date
-
-        // Ensure the reservation is for today
-        if (!mealDay.isEqual(today)) {
-            System.out.println("Reservation is not valid for today!");
-            return;
+        if (res == null || !"VALIDA".equals(res.getStatus())) {
+            return false;
         }
 
-        if (res.getStatus().equals("VALIDA")) {
-            res.setStatus("USADO");
-            reservationRepository.save(res);
+        LocalDate today = LocalDate.now();
+        LocalDate mealDate = res.getMeal().getDate();
+
+        if (!today.equals(mealDate)) {
+            return false;
         }
-        else {
-            System.out.println("Invalid reservation!");
-        }
+
+        res.setStatus("USADO");
+        reservationRepository.save(res);
+        return true;
     }
 }

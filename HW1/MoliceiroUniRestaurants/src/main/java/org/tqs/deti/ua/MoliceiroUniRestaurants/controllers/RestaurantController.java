@@ -1,5 +1,6 @@
 package org.tqs.deti.ua.MoliceiroUniRestaurants.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.models.Restaurant;
@@ -15,7 +16,7 @@ public class RestaurantController {
     private RestaurantService restaurantService;
 
     @PostMapping("")
-    public Restaurant createRestaurant(@RequestBody Restaurant restaurant) {
+    public Restaurant createRestaurant(@Valid @RequestBody Restaurant restaurant) {
         return restaurantService.createRestaurant(restaurant);
     }
 
