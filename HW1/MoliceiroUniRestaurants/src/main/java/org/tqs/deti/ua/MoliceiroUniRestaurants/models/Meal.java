@@ -38,7 +38,7 @@ public class Meal {
     @JoinColumn(name = "restaurant", referencedColumnName = "id")
     private Restaurant restaurant;
 
-    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, orphanRemoval = true)  // Fix: "meal" instead of "reservation"
     private List<Reservation> reservations = new ArrayList<>();
 
     public LocalDate getDate() {

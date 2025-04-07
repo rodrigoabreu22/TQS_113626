@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${restaurant.name} + ' Details'">Restaurant Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .weather-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid #6e48aa;
+        }
+        .weather-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .highlight-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="container py-4">
+    <!-- Back Button -->
+    <a href="/restaurants" class="btn btn-outline-secondary mb-4">
+        <i class="bi bi-arrow-left"></i> Back to Restaurants
+    </a>
+
+    <!-- Restaurant Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h2 th:text="${restaurant.name}">Restaurant Name</h2>
+            <p class="text-muted">Weather ID: <span th:text="${restaurant.weatherId}"></span></p>
+        </div>
+    </div>
+
+    <!-- Weather Forecast Section -->
+    <div class="row mb-5">
+        <div class="col">
+            <h4 class="mb-4"><i class="bi bi-cloud-sun"></i> Weather Forecast</h4>
+
+            <div th:if="${weatherData.empty}" class="alert alert-warning">
+                No weather data available
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div th:each="forecast : ${weatherData}" class="col">
+                    <div class="card h-100 weather-card">
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${forecast.key}">Date</h5>
+                            <div class="weather-details">
+                                <p class="mb-1"><i class="bi bi-thermometer-low"></i> Min:
+                                    <span th:text="${forecast.value[0]} + '°C'">0°C</span>
+                                </p>
+                                <p class="mb-1"><i class="bi bi-thermometer-high"></i> Max:
+                                    <span th:text="${forecast.value[1]} + '°C'">0°C</span>
+                                </p>
+                                <p class="mb-1"><i class="bi bi-droplet"></i> Rain:
+                                    <span th:text="${forecast.value[2]} + '%'">0%</span>
+                                </p>
+                                <p class="mb-0"><i class="bi bi-wind"></i> Wind:
+                                    <span th:text="${forecast.value[3]}">Direction</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Meals Section -->
+    <div class="row">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4><i class="bi bi-egg-fried"></i> Available Meals</h4>
+                <a th:href="@{/restaurants/{id}/meals(id=${restaurant.id})}"
+                   class="btn btn-primary">
+                    View All Meals <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- Placeholder for meals - you would replace this with actual meal data -->
+            <div class="card highlight-card mb-3">
+                <div class="card-body">
+                    <p class="text-muted mb-0">Meal information would be displayed here</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

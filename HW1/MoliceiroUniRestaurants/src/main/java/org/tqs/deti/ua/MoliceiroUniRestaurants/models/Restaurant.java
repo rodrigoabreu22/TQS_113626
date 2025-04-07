@@ -2,6 +2,7 @@ package org.tqs.deti.ua.MoliceiroUniRestaurants.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +19,11 @@ public class Restaurant {
     private String name;
 
     //make weather requests on IPMA API
-    @Column(name = "wheatherId", nullable = false)
+    @NotNull(message = "Weather ID is mandatory")
+    @Column(name = "weather_id", nullable = false)
     private int weatherId;
 
-    @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Meal> meals = new ArrayList<>();
 
     public List<Meal> getMeals() {

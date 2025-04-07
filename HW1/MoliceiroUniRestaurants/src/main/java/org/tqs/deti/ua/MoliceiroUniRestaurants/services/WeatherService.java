@@ -3,8 +3,10 @@ package org.tqs.deti.ua.MoliceiroUniRestaurants.services;
 import org.springframework.stereotype.Service;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.cache.CacheStatistics;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.cache.InMemoryCache;
+import org.tqs.deti.ua.MoliceiroUniRestaurants.ipma_forecast.CityForecast;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.ipma_forecast.IpmaCityForecast;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.ipma_forecast.IpmaService;
+import org.tqs.deti.ua.MoliceiroUniRestaurants.models.Restaurant;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -19,67 +21,73 @@ import org.slf4j.LoggerFactory;
 
 @Service
 public class WeatherService {
-
     private static final Logger log = LoggerFactory.getLogger(WeatherService.class);
+    private static final String BASE_URL = "https://api.ipma.pt/open-data/";
 
-    private static final String BASE_URL = "http://api.ipma.pt/open-data/";
-
-    private final InMemoryCache<Long, HashMap<String, List<String>>> restaurantWeatherCache = new InMemoryCache<>();
-    private final CacheStatistics restaurantWeatherCacheStatistics = new CacheStatistics();
-
-    // get a retrofit instance, loaded with the GSon lib to convert JSON into objects
-    Retrofit retrofit = new Retrofit.Builder()
+    private final Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
-    // create a typed interface to use the remote API (a client)
-    IpmaService service = retrofit.create(IpmaService.class);
+    private final IpmaService service = retrofit.create(IpmaService.class);
+    private final RestaurantService restaurantService;
+
+    public WeatherService(RestaurantService restaurantService) {
+        this.restaurantService = restaurantService;
+    }
+
+    private final InMemoryCache<Long, HashMap<String, List<String>>> restaurantWeatherCache = new InMemoryCache<>();
+    private final CacheStatistics restaurantWeatherCacheStatistics = new CacheStatistics();
 
     public HashMap<String, List<String>> getRestaurantWeatherData(long restaurantId) {
-        HashMap<String, List<String>> restaurantWeather = restaurantWeatherCache.get(restaurantId);
-        if (restaurantWeather != null) {
-            log.info("Weather data retrieved from cache");
-            log.info("Cache hit!");
-            restaurantWeatherCacheStatistics.incrementHits();
-            return restaurantWeather;
-        }
-
-        log.info("Cache miss!");
-
-        restaurantWeatherCacheStatistics.incrementMisses();
-
-        Call<IpmaCityForecast> callSync = service.getForecastForACity((int) restaurantId);
-        HashMap<String, List<String>> weatherData = new HashMap<>();
-
         try {
-            Response<IpmaCityForecast> apiResponse = callSync.execute();
-            IpmaCityForecast forecast = apiResponse.body();
 
-            if (forecast != null) {
-                var weather_days = forecast.getData().listIterator();
-                while (weather_days.hasNext()) {
-                    var firstDay = weather_days.next();
-
-                    List<String> weatherDataValues = new ArrayList<>();
-                    weatherDataValues.add(firstDay.getTMin());
-                    weatherDataValues.add(firstDay.getTMax());
-                    weatherDataValues.add(firstDay.getPrecipitaProb());
-                    weatherDataValues.add(firstDay.getPredWindDir());
-
-                    weatherData.put(firstDay.getForecastDate(), weatherDataValues);
-                }
-            } else {
-                System.out.println( "No results for this request!");
+            HashMap<String, List<String>> restaurantWeather = restaurantWeatherCache.get(restaurantId);
+            if (restaurantWeather != null) {
+                log.info("Weather data retrieved from cache");
+                log.info("Cache hit!");
+                restaurantWeatherCacheStatistics.incrementHits();
+                return restaurantWeather;
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+
+            log.info("Cache miss!");
+
+            restaurantWeatherCacheStatistics.incrementMisses();
+
+            Restaurant restaurant = restaurantService.getRestaurant(restaurantId);
+
+            Call<IpmaCityForecast> call = service.getForecastForACity(restaurant.getWeatherId());
+            Response<IpmaCityForecast> response = call.execute();
+
+            if (!response.isSuccessful()) {
+                log.error("API request failed with code: {} for city {}", response.code(), restaurant.getWeatherId());
+                return new HashMap<>();
+            }
+
+            IpmaCityForecast forecast = response.body();
+            if (forecast == null || forecast.getData() == null) {
+                log.warn("No forecast data received for city {}", restaurant.getWeatherId());
+                return new HashMap<>();
+            }
+
+            HashMap<String, List<String>> weatherData = new HashMap<>();
+            for (CityForecast forecastDay : forecast.getData()) {
+                List<String> dayData = new ArrayList<>();
+                dayData.add(forecastDay.getTMin());
+                dayData.add(forecastDay.getTMax());
+                dayData.add(forecastDay.getPrecipitaProb());
+                dayData.add(forecastDay.getPredWindDir());
+                weatherData.put(forecastDay.getForecastDate(), dayData);
+            }
+
+            log.info("cache hit!");
+            restaurantWeatherCache.put(restaurantId, weatherData);
+            restaurantWeatherCacheStatistics.incrementPuts();
+
+            return weatherData;
+        } catch (Exception e) {
+            log.error("Error fetching weather data for city: {}", e.getMessage());
+            return new HashMap<>();
         }
-
-        log.info("cache hit!");
-        restaurantWeatherCache.put(restaurantId, weatherData);
-        restaurantWeatherCacheStatistics.incrementPuts();
-
-        return weatherData;
     }
 }
