@@ -58,17 +58,17 @@ class MealTests {
     void testSetReservations() {
         List<Reservation> reservations = new ArrayList<>();
         Reservation res1 = new Reservation();
-        res1.setCode(1L);
+        res1.setId(1L);
         Reservation res2 = new Reservation();
-        res2.setCode(2L);
+        res2.setId(2L);
         reservations.add(res1);
         reservations.add(res2);
 
         meal.setReservations(reservations);
 
         assertEquals(2, meal.getReservations().size());
-        assertEquals(1L, meal.getReservations().get(0).getCode());
-        assertEquals(2L, meal.getReservations().get(1).getCode());
+        assertEquals(1L, meal.getReservations().get(0).getId());
+        assertEquals(2L, meal.getReservations().get(1).getId());
     }
 
     @Test

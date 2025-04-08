@@ -1,5 +1,6 @@
 package org.tqs.deti.ua.MoliceiroUniRestaurants.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -36,9 +37,11 @@ public class Meal {
     @ManyToOne
     @NotNull(message = "Restaurant is mandatory")
     @JoinColumn(name = "restaurant", referencedColumnName = "id")
+    @JsonIgnore
     private Restaurant restaurant;
 
-    @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, orphanRemoval = true)  // Fix: "meal" instead of "reservation"
+    @JsonIgnore
+    @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations = new ArrayList<>();
 
     public LocalDate getDate() {

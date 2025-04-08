@@ -2,8 +2,11 @@ package org.tqs.deti.ua.MoliceiroUniRestaurants.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.tqs.deti.ua.MoliceiroUniRestaurants.models.Meal;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.models.Reservation;
+import org.tqs.deti.ua.MoliceiroUniRestaurants.repositories.MealRepository;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.repositories.ReservationRepository;
+import org.tqs.deti.ua.MoliceiroUniRestaurants.repositories.RestaurantRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,44 +16,48 @@ import java.util.List;
 @Service
 public class ReservationService {
     private final ReservationRepository reservationRepository;
+    private final MealRepository mealRepository;
 
     @Autowired
-    public ReservationService(ReservationRepository reservationRepository) {
+    public ReservationService(ReservationRepository reservationRepository, MealRepository mealRepository) {
         this.reservationRepository = reservationRepository;
+        this.mealRepository = mealRepository;
     }
 
-    public Reservation bookMeal(Reservation reservation) {
-        if (reservation == null || reservation.getMeal() == null) {
-            throw new IllegalArgumentException("Reservation and meal must not be null");
+    public Reservation bookMeal(long mealId) {
+        Meal meal = mealRepository.findById(mealId);
+        if (meal == null) {
+            return null;
         }
 
-        LocalDate mealDate = reservation.getMeal().getDate();
+        LocalDate mealDate = meal.getDate();
         if (mealDate == null || mealDate.isBefore(LocalDate.now())) {
             return null;
         }
 
-        long mealId = reservation.getMeal().getId();
-        int validReservations = reservationRepository.findByMealIdAndStatus(mealId, "VALIDA").size();
-        int limit = reservation.getMeal().getReservationLimit();
+        int validReservations = reservationRepository.findByMealIdAndStatus(mealId, "VALID").size();
+        int limit = meal.getReservationLimit();
 
         if (validReservations >= limit) {
             return null;
         }
 
         LocalDateTime now = LocalDateTime.now();
-        String mealType = reservation.getMeal().getType();
-        LocalTime deadline = mealType.equalsIgnoreCase("Almoço") ? LocalTime.of(12, 0) : LocalTime.of(18, 0);
+        String mealType = meal.getType();
+        LocalTime deadline = mealType.equalsIgnoreCase("Lunch") ? LocalTime.of(12, 0) : LocalTime.of(18, 0);
 
         if (mealDate.isEqual(LocalDate.now()) && now.toLocalTime().isAfter(deadline)) {
             return null;
         }
 
+        Reservation reservation = new Reservation(meal);
+
         reservation.setStatus("VALIDA"); // Explicitly set status
         return reservationRepository.save(reservation);
     }
 
-    public Reservation getReservationByCode(long code) {
-        return reservationRepository.findByCode(code);
+    public Reservation getReservationById(long id) {
+        return reservationRepository.findById(id);
     }
 
     public List<Reservation> getMealReservations(long mealId, String status) {
@@ -60,16 +67,16 @@ public class ReservationService {
     }
 
     public void cancelReservation(long reservationId) {
-        Reservation res = getReservationByCode(reservationId);
-        if (res != null && "VALIDA".equals(res.getStatus())) {
-            res.setStatus("CANCELADA");
+        Reservation res = getReservationById(reservationId);
+        if (res != null && "VALID".equals(res.getStatus())) {
+            res.setStatus("CANCELLED");
             reservationRepository.save(res);
         }
     }
 
     public boolean validateReservation(long reservationId) {
-        Reservation res = getReservationByCode(reservationId);
-        if (res == null || !"VALIDA".equals(res.getStatus())) {
+        Reservation res = getReservationById(reservationId);
+        if (res == null || !"VALID".equals(res.getStatus())) {
             return false;
         }
 
@@ -80,8 +87,12 @@ public class ReservationService {
             return false;
         }
 
-        res.setStatus("USADO");
+        res.setStatus("USED");
         reservationRepository.save(res);
         return true;
+    }
+
+    public Reservation getReservationByCode(String code) {
+        return reservationRepository.findByCode(code);
     }
 }

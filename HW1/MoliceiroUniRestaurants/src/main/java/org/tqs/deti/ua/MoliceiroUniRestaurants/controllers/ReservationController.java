@@ -17,13 +17,24 @@ public class ReservationController {
     @Autowired
     ReservationService reservationService;
 
-    @PostMapping("")
-    public Reservation createReservation(@Valid @RequestBody Reservation reservation) {
-        return reservationService.bookMeal(reservation);
+    @PostMapping("/meal/{id}")
+    public ResponseEntity<Reservation> createReservation(@PathVariable(value="id") Long id) {
+        Reservation reservation = reservationService.bookMeal(id);
+        if (reservation != null) {
+            return ResponseEntity.ok(reservation);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
-    @GetMapping("/{code}")
-    public Reservation getReservation(@PathVariable(value="code") Long code) {
+
+    @GetMapping("/{id}")
+    public Reservation getReservation(@PathVariable(value="id") Long code) {
+        return reservationService.getReservationById(code);
+    }
+
+    @GetMapping("/code/{code}")
+    public Reservation getReservation(@PathVariable(value="code") String code) {
         return reservationService.getReservationByCode(code);
     }
 
@@ -32,20 +43,20 @@ public class ReservationController {
         return reservationService.getMealReservations(id, status);
     }
 
-    @PutMapping("/{code}/validate")
-    public ResponseEntity<String> validateReservation(@PathVariable(value="code") Long code) {
+    @PutMapping("/{id}/validate")
+    public ResponseEntity<String> validateReservation(@PathVariable(value="id") Long id) {
         try {
-            reservationService.validateReservation(code);
+            reservationService.validateReservation(id);
             return ResponseEntity.ok().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
     }
 
-    @PutMapping("/{code}/cancel")
-    public ResponseEntity<String> cancelReservation(@PathVariable(value="code") Long code) {
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<String> cancelReservation(@PathVariable(value="id") Long id) {
         try {
-            reservationService.cancelReservation(code);
+            reservationService.cancelReservation(id);
             return ResponseEntity.ok().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());

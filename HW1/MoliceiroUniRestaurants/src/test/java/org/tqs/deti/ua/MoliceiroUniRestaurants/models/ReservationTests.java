@@ -24,7 +24,7 @@ class ReservationTests {
         when(mockMeal.getName()).thenReturn("Test Meal");
 
         reservation = new Reservation();
-        reservation.setCode(TEST_CODE);
+        reservation.setId(TEST_CODE);
         reservation.setStatus(TEST_STATUS);
         reservation.setMeal(mockMeal);
     }
@@ -34,12 +34,12 @@ class ReservationTests {
         Reservation defaultReservation = new Reservation();
         assertEquals("VALIDA", defaultReservation.getStatus());
         assertNull(defaultReservation.getMeal());
-        assertEquals(0L, defaultReservation.getCode());
+        assertEquals(0L, defaultReservation.getId());
     }
 
     @Test
     void testGettersAndSetters() {
-        assertEquals(TEST_CODE, reservation.getCode());
+        assertEquals(TEST_CODE, reservation.getId());
         assertEquals(TEST_STATUS, reservation.getStatus());
         assertEquals(mockMeal, reservation.getMeal());
     }
@@ -72,13 +72,13 @@ class ReservationTests {
     void testEqualsAndHashCode() {
         // Create identical reservation
         Reservation sameReservation = new Reservation();
-        sameReservation.setCode(TEST_CODE);
+        sameReservation.setId(TEST_CODE);
         sameReservation.setStatus(TEST_STATUS);
         sameReservation.setMeal(mockMeal);
 
         // Create different reservation
         Reservation differentReservation = new Reservation();
-        differentReservation.setCode(99999L);
+        differentReservation.setId(99999L);
         differentReservation.setStatus("CANCELADA");
         differentReservation.setMeal(Mockito.mock(Meal.class));
 

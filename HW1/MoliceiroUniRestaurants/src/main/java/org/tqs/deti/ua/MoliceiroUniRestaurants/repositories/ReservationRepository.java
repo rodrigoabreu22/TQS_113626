@@ -6,7 +6,8 @@ import org.tqs.deti.ua.MoliceiroUniRestaurants.models.Reservation;
 import java.util.List;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
-    Reservation findByCode(long code);
+    Reservation findById(long id);
+    Reservation findByCode(String code);
     List<Reservation> findByMealId(long mealId);
     List<Reservation> findByMealIdAndStatus(long mealId, String status);
 
