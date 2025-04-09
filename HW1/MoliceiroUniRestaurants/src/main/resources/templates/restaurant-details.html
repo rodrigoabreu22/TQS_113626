@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Meals List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .navbar-custom {
+            background-color: seagreen;
+        }
+        .navbar-custom .nav-link,
+        .navbar-custom .navbar-brand {
+            color: white;
+        }
+        .meal-card {
+            margin-bottom: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .meal-section {
+            padding: 1rem;
+        }
+
+        .meal-header {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+        }
+
+        .meal-time {
+            font-weight: bold;
+            color: #198754;
+        }
+
+        .no-meal {
+            color: #aaa;
+            font-style: italic;
+        }
+
+        .weather-icon {
+            font-size: 1.1rem;
+            color: #0d6efd;
+        }
+
+        .weather-section {
+            background-color: #f1f3f5;
+            padding: 1rem;
+            border-radius: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+        <a class="navbar-brand" href="http://localhost:8080/restaurants">Moliceiro University Restaurants</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="http://localhost:8080/restaurants">Restaurants</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="http://localhost:8080/reservations/search">Search Reservation</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4">
+    <!-- Back Button -->
+    <div class="mb-3">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+    </div>
+
+    <!-- Title -->
+    <h2 class="text-center mb-4">Meals at the Restaurant: <span th:text="${restaurant.name}"></span></h2>
+
+    <!-- Empty State -->
+    <div th:if="${(mealsByDateAndType ?: {}).isEmpty()}">
+        <div class="alert alert-warning text-center">
+            No meals available for this restaurant on the selected dates.
+        </div>
+    </div>
+
+    <!-- Meal Cards -->
+    <div th:each="mealByDate : ${mealsByDateAndType}">
+        <div class="card meal-card">
+            <div class="meal-header">
+                <h5 class="mb-0" th:text="${#temporals.format(mealByDate.key, 'EEEE')} + ' - ' + ${#temporals.format(mealByDate.key, 'yyyy-MM-dd')}"></h5>
+            </div>
+            <div class="meal-section row">
+                <!-- Lunch -->
+                <div class="col-md-4">
+                    <h6><i class="bi bi-sun"></i> Lunch</h6>
+                    <div th:if="${mealByDate.value['lunch'] != null}">
+                        <p><strong>Meal:</strong> <span th:text="${mealByDate.value['lunch'].get(0).name}"></span></p>
+                        <p class="meal-time text-black"><strong>Schedule:</strong> 12:00 - 14:30</p>
+                        <p th:text="'Reservation Limit: ' + ${mealByDate.value['lunch'].get(0).reservationLimit}"></p>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-success btn-sm" onclick="confirmReservation(this)"
+                                    th:attr="data-mealid=${mealByDate.value['lunch'].get(0).id}">
+                                Reserve
+                            </button>
+                            <a class="btn btn-secondary btn-sm"
+                               th:href="@{/reservations/meal/{id}(id=${mealByDate.value['lunch'].get(0).id})}">
+                                Check Reservations
+                            </a>
+                        </div>
+                    </div>
+                    <div th:if="${mealByDate.value['lunch'] == null}" class="no-meal">No lunch available</div>
+                </div>
+
+
+                <!-- Dinner -->
+                <div class="col-md-4">
+                    <h6><i class="bi bi-moon-stars"></i> Dinner</h6>
+                    <div th:if="${mealByDate.value['dinner'] != null}">
+                        <p><strong>Meal:</strong> <span th:text="${mealByDate.value['dinner'].get(0).name}"></span></p>
+                        <p class="meal-time text-black"><strong>Schedule:</strong> 19:00 - 22:00</p>
+                        <p th:text="'Reservation Limit: ' + ${mealByDate.value['dinner'].get(0).reservationLimit}"></p>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-success btn-sm" onclick="confirmReservation(this)"
+                                    th:attr="data-mealid=${mealByDate.value['dinner'].get(0).id}">
+                                Reserve
+                            </button>
+                            <a class="btn btn-secondary btn-sm"
+                               th:href="@{/reservations/meal/{id}(id=${mealByDate.value['dinner'].get(0).id})}">
+                                Check Reservations
+                            </a>
+                        </div>
+                    </div>
+                    <div th:if="${mealByDate.value['dinner'] == null}" class="no-meal">No dinner available</div>
+                </div>
+
+
+                <!-- Weather -->
+                <div class="col-md-4">
+                    <h6><i class="bi bi-cloud-sun"></i> Weather</h6>
+                    <div class="weather-section"
+                         th:if="${weatherData != null and weatherData.containsKey(#temporals.format(mealByDate.key, 'yyyy-MM-dd'))}">
+                        <div th:with="weather=${weatherData.get(#temporals.format(mealByDate.key, 'yyyy-MM-dd'))}">
+                            <p><i class="bi bi-thermometer-low weather-icon"></i> Min: <span th:text="${weather[0]} + '°C'"></span></p>
+                            <p><i class="bi bi-thermometer-high weather-icon"></i> Max: <span th:text="${weather[1]} + '°C'"></span></p>
+                            <p><i class="bi bi-droplet weather-icon"></i> Rain: <span th:text="${weather[2]} + '%'"></span></p>
+                            <p><i class="bi bi-wind weather-icon"></i> Wind: <span th:text="${weather[3]}"></span></p>
+                        </div>
+                    </div>
+                    <div th:unless="${weatherData != null and weatherData.containsKey(#temporals.format(mealByDate.key, 'yyyy-MM-dd'))}" class="text-muted">
+                        No weather data
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Modal and JS as before -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Your reservation modal and JS functions should go below or in a separate file -->
+<script>
+    function confirmReservation(button) {
+        const mealId = button.getAttribute("data-mealid");
+
+        fetch(`/api/v1/reservation/meal/${mealId}`, {
+            method: "POST"
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Reservation failed.");
+                return res.json();
+            })
+            .then(data => {
+                const modalMessage = document.getElementById('modalMessage');
+                const highlightCode = document.getElementById('highlightCode');
+                if (data && data.code) {
+                    modalMessage.innerText = "Reservation confirmed!";
+                    highlightCode.innerText = "Your code is: " + data.code;
+                    highlightCode.style.display = "block";
+                } else {
+                    modalMessage.innerText = "Reservation could not be completed.";
+                    highlightCode.style.display = "none";
+                }
+                const modal = new bootstrap.Modal(document.getElementById('reservationModal'));
+                modal.show();
+            })
+            .catch(() => {
+                const modalMessage = document.getElementById('modalMessage');
+                modalMessage.innerText = "Reservation failed. It might be full, expired, or invalid.";
+                document.getElementById('highlightCode').style.display = "none";
+                const modal = new bootstrap.Modal(document.getElementById('reservationModal'));
+                modal.show();
+            });
+    }
+</script>
+
+<!-- Reservation Modal (same as before) -->
+<div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reservation Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage"></p>
+                <div id="highlightCode" class="highlight-code" style="display:none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

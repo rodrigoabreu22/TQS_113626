@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Meal Reservations</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar-custom {
+            background-color: seagreen;
+        }
+        .navbar-custom .nav-link,
+        .navbar-custom .navbar-brand {
+            color: white;
+        }
+        .reservation-card {
+            transition: transform 0.2s;
+        }
+        .reservation-card:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+        <a class="navbar-brand" href="http://localhost:8080/restaurants">Moliceiro University Restaurants</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="http://localhost:8080/restaurants">Restaurants</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="http://localhost:8080/reservations/search">Search Reservation</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Content -->
+<div class="container mt-4">
+    <h2 class="mb-3" th:text="'Reservations for Meal: ' + ${meal.name}"></h2>
+    <p><strong>Type:</strong> <span th:text="${meal.restaurant.name}"></span></p>
+    <p><strong>Type:</strong> <span th:text="${meal.type}"></span></p>
+    <p><strong>Date:</strong> <span th:text="${#temporals.format(meal.date, 'yyyy-MM-dd')}"></span></p>
+    <p><strong>Time:</strong> <span th:text="${meal.type == 'lunch' ? '12:00 - 14:30' : '19:00 - 22:00'}"></span></p>
+
+    <div class="alert alert-secondary">
+        <strong th:text="'Total Reservations: ' + ${valid}"></strong><br>
+        <strong th:text="'Available Spots: ' + ${available}"></strong>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4 mt-4" th:if="${!reservations.isEmpty()}">
+        <div class="col" th:each="res : ${reservations}">
+            <div class="card reservation-card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Reservation</h5>
+                    <p><strong>Status:</strong> <span th:text="${res.status}"></span></p>
+                    <p><strong>Code:</strong> <span class="text-primary fw-bold" th:text="${res.code}"></span></p>
+                    <button class="btn mt-2"
+                            th:classappend="${res.status == 'VALID'} ? 'btn-success' : 'btn-secondary'"
+                            th:text="${res.status == 'VALID'} ? 'Validate' : 'Already Used'"
+                            th:disabled="${res.status != 'VALID'}"
+                            th:attr="data-resid=${res.id}"
+                            onclick="validateReservation(this)">
+                    </button>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${reservations.isEmpty()}">
+        <div class="alert alert-warning text-center">
+            No reservations for this meal yet.
+        </div>
+    </div>
+</div>
+
+<script>
+    function validateReservation(button) {
+        const reservationId = button.getAttribute("data-resid");
+
+        fetch(`/api/v1/reservation/${reservationId}/validate`, {
+            method: "PUT"
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert("Reservation validated successfully!");
+                    location.reload();
+                } else if (response.status === 409) {
+                    return response.text().then(msg => { throw new Error(msg); });
+                } else {
+                    throw new Error("Validation failed.");
+                }
+            })
+            .catch(err => {
+                alert("Error: " + err.message);
+            });
+    }
+</script>
+
+
+<!-- Bootstrap Bundle JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

@@ -52,7 +52,7 @@ public class ReservationService {
 
         Reservation reservation = new Reservation(meal);
 
-        reservation.setStatus("VALIDA"); // Explicitly set status
+        reservation.setStatus("VALID"); // Explicitly set status
         return reservationRepository.save(reservation);
     }
 

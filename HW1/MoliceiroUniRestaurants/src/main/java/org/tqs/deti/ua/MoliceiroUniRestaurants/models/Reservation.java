@@ -31,7 +31,7 @@ public class Reservation {
 
     // Constructor to initialize Reservation with Meal and generate code
     public Reservation(Meal meal) {
-        this.status = "VALIDA";
+        this.status = "VALID";
         this.meal = meal;
         this.code = generateRandomCode();  // Set code when creating reservation
     }
