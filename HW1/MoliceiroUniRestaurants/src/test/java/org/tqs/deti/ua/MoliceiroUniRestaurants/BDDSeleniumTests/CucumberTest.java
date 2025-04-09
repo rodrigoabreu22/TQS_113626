@@ -12,5 +12,5 @@ import org.junit.platform.suite.api.Suite;
 @SelectClasspathResource("org/tqs/deti/ua/MoliceiroUniRestaurants")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "org.tqs.deti.ua.MoliceiroUniRestaurants")
 public class CucumberTest {
-
+    
 }
