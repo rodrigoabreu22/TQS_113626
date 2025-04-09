@@ -90,4 +90,8 @@ public class WeatherService {
             return new HashMap<>();
         }
     }
+
+    public String getCacheStatistics(){
+        return this.restaurantWeatherCacheStatistics.toString();
+    }
 }
