@@ -18,6 +18,10 @@
         .reservation-card:hover {
             transform: scale(1.02);
         }
+        .validated {
+            background-color: #d4edda;  /* Green background for validated */
+            color: #155724;  /* Dark green text */
+        }
     </style>
 </head>
 <body>
@@ -57,10 +61,10 @@
 
     <div class="row row-cols-1 row-cols-md-3 g-4 mt-4" th:if="${!reservations.isEmpty()}">
         <div class="col" th:each="res : ${reservations}">
-            <div class="card reservation-card shadow-sm h-100">
+            <div class="card reservation-card shadow-sm h-100" id="reservation-${res.id}">
                 <div class="card-body text-center">
                     <h5 class="card-title">Reservation</h5>
-                    <p><strong>Status:</strong> <span th:text="${res.status}"></span></p>
+                    <p><strong>Status:</strong> <span class="status" th:text="${res.status}"></span></p>
                     <p><strong>Code:</strong> <span class="text-primary fw-bold" th:text="${res.code}"></span></p>
                     <button class="btn mt-2"
                             th:classappend="${res.status == 'VALID'} ? 'btn-success' : 'btn-secondary'"
@@ -69,8 +73,6 @@
                             th:attr="data-resid=${res.id}"
                             onclick="validateReservation(this)">
                     </button>
-
-
                 </div>
             </div>
         </div>
@@ -93,7 +95,7 @@
             .then(response => {
                 if (response.ok) {
                     alert("Reservation validated successfully!");
-                    location.reload();
+                    location.reload();  // Reload the page to reflect changes
                 } else if (response.status === 409) {
                     return response.text().then(msg => { throw new Error(msg); });
                 } else {
@@ -105,7 +107,6 @@
             });
     }
 </script>
-
 
 <!-- Bootstrap Bundle JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

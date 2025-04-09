@@ -1,12 +1,13 @@
 package org.tqs.deti.ua.MoliceiroUniRestaurants.services;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.tqs.deti.ua.MoliceiroUniRestaurants.dto.ReservationDTO;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.models.Meal;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.models.Reservation;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.repositories.MealRepository;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.repositories.ReservationRepository;
-import org.tqs.deti.ua.MoliceiroUniRestaurants.repositories.RestaurantRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,9 +25,11 @@ public class ReservationService {
         this.mealRepository = mealRepository;
     }
 
+    @Transactional
     public Reservation bookMeal(long mealId) {
         Meal meal = mealRepository.findById(mealId);
         if (meal == null) {
+            System.out.println("meal not found");
             return null;
         }
 
@@ -51,8 +54,7 @@ public class ReservationService {
         }
 
         Reservation reservation = new Reservation(meal);
-
-        reservation.setStatus("VALID"); // Explicitly set status
+        reservation.setStatus("VALID");
         return reservationRepository.save(reservation);
     }
 
@@ -68,10 +70,20 @@ public class ReservationService {
 
     public void cancelReservation(long reservationId) {
         Reservation res = getReservationById(reservationId);
-        if (res != null && "VALID".equals(res.getStatus())) {
-            res.setStatus("CANCELLED");
-            reservationRepository.save(res);
+        if (res == null) {
+            throw new IllegalArgumentException("Reservation not found");
         }
+
+        if ("USED".equals(res.getStatus())) {
+            throw new IllegalStateException("Cannot cancel already used reservation");
+        }
+
+        if ("CANCELLED".equals(res.getStatus())) {
+            throw new IllegalStateException("Cannot cancel already cancelled reservation");
+        }
+
+        res.setStatus("CANCELLED");
+        reservationRepository.save(res);
     }
 
     public boolean validateReservation(long reservationId) {
