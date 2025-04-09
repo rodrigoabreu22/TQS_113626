@@ -2,6 +2,7 @@ package org.tqs.deti.ua.MoliceiroUniRestaurants.controllers;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.models.Restaurant;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.services.RestaurantService;
@@ -26,8 +27,12 @@ public class RestaurantController {
     }
 
     @GetMapping("/{id}")
-    public Restaurant getRestaurant(@PathVariable(value="id") Long id) {
-        return restaurantService.getRestaurant(id);
+    public ResponseEntity<?> getRestaurant(@PathVariable long id) {
+        Restaurant restaurant = restaurantService.getRestaurant(id);
+        if (restaurant == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(restaurant);
     }
 
     @PutMapping("/{id}")

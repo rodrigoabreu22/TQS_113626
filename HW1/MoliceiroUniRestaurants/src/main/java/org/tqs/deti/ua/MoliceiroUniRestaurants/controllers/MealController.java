@@ -2,8 +2,12 @@ package org.tqs.deti.ua.MoliceiroUniRestaurants.controllers;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.tqs.deti.ua.MoliceiroUniRestaurants.dto.MealDTO;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.models.Meal;
+import org.tqs.deti.ua.MoliceiroUniRestaurants.models.Restaurant;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.services.MealService;
 
 import java.time.LocalDate;
@@ -17,9 +21,24 @@ public class MealController {
     private MealService mealService;
 
     @PostMapping("")
-    public Meal addMeal(@Valid @RequestBody Meal meal) {
+    public Meal addMeal(@Valid @RequestBody MealDTO mealDto) {
+        if (mealDto.getRestaurantId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Restaurant ID is mandatory");
+        }
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setId(mealDto.getRestaurantId());
+
+        Meal meal = new Meal();
+        meal.setName(mealDto.getName());
+        meal.setType(mealDto.getType());
+        meal.setReservationLimit(mealDto.getReservationLimit());
+        meal.setDate(mealDto.getDate());
+        meal.setRestaurant(restaurant);
+
         return mealService.createMeal(meal);
     }
+
 
     @GetMapping("/all")
     public List<Meal> getAllMeals() {

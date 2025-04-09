@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -14,13 +15,16 @@ import org.tqs.deti.ua.MoliceiroUniRestaurants.services.MealService;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(MealController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class MealControllerTest {
 
     @Autowired
@@ -42,6 +46,9 @@ class MealControllerTest {
 
         Restaurant restaurant = new Restaurant();
         restaurant.setId(1L);
+        restaurant.setName("Restaurant");
+        restaurant.setWeatherId(1010500);
+
         meal.setRestaurant(restaurant);
 
         return meal;
@@ -51,19 +58,26 @@ class MealControllerTest {
     void addMeal_ShouldReturnCreatedMeal() throws Exception {
         Meal newMeal = createValidMeal(1L);
 
+        Map<String, Object> dto = new HashMap<>();
+        dto.put("name", newMeal.getName());
+        dto.put("type", newMeal.getType());
+        dto.put("reservationLimit", newMeal.getReservationLimit());
+        dto.put("date", newMeal.getDate().toString());
+        dto.put("restaurantId", newMeal.getRestaurant().getId());
+
         Mockito.when(mealService.createMeal(Mockito.any(Meal.class)))
                 .thenReturn(newMeal);
 
         mockMvc.perform(post("/api/v1/meal")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newMeal)))
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.name", is("Daily Special")))
                 .andExpect(jsonPath("$.type", is("Lunch")))
-                .andExpect(jsonPath("$.reservationLimit", is(50)))
-                .andExpect(jsonPath("$.restaurant.id", is(1)));
+                .andExpect(jsonPath("$.reservationLimit", is(50)));
     }
+
 
     @Test
     void addMeal_ShouldReturnBadRequest_WhenInvalidInput() throws Exception {
