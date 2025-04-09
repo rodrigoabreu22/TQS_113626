@@ -3,7 +3,6 @@ package org.tqs.deti.ua.MoliceiroUniRestaurants.services;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.tqs.deti.ua.MoliceiroUniRestaurants.dto.ReservationDTO;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.models.Meal;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.models.Reservation;
 import org.tqs.deti.ua.MoliceiroUniRestaurants.repositories.MealRepository;
