@@ -59,3 +59,5 @@ SpotBugs
 - Analyzes compiled bytecode.
 - Detects null pointer issues, logic errors, performance flaws.
 
+SonarQube integrates with all three to centralize code analysis. Shows results as bugs, vulnerabilities, and code smells.
+
